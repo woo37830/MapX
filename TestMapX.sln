@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.810.25
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestMapX", "TestMapX\TestMapX.csproj", "{B75FF093-2D89-45AC-9ED9-893F0BE03C53}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestMapX", "TestMapX\TestMapX.csproj", "{50A8D1E3-586D-4133-85B8-3B2C27563800}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B75FF093-2D89-45AC-9ED9-893F0BE03C53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B75FF093-2D89-45AC-9ED9-893F0BE03C53}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B75FF093-2D89-45AC-9ED9-893F0BE03C53}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B75FF093-2D89-45AC-9ED9-893F0BE03C53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50A8D1E3-586D-4133-85B8-3B2C27563800}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50A8D1E3-586D-4133-85B8-3B2C27563800}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50A8D1E3-586D-4133-85B8-3B2C27563800}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50A8D1E3-586D-4133-85B8-3B2C27563800}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

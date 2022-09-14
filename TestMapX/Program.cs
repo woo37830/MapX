@@ -8,8 +8,27 @@ namespace TestMapX
     {
         static void Main(string[] args)
         {
+            string configFile = "/Users/woo/Development/workspaces/TestMapX/TestMapX/myconfig.txt";
+            string noteStr = "";
+            string interactiveFlag = "NO";
+            if (args.Length > 0)
+            {
+                configFile = args[0]; // location of configFile
+            }
+            if (args.Length > 1)
+            {
+                noteStr = args[1];
+            }
+            if (args.Length == 2)
+            {
+                interactiveFlag = args[2];
+            }
+            Configuration config = new ConfigurationBuilder(configFile).Build(noteStr, interactiveFlag);
+            string dataSource = config.get("dataSource");
+            string dataUser = config.get("dataUser");
+            string dataPassword = config.get("dataPassword");
+            string connString = "Data Source=" + dataSource + "; user id=" + dataUser + "; password=" + dataPassword + ";";
 
-            Configuration config = new ConfigurationBuilder("/Users/woo/Development/workspaces/TestMapX/TestMapX/myconfig.txt").Build();
 
             String file = "/Users/woo/Development/workspaces/TestMapX/TestMapX/segments.txt";
             StreamReader dataStream = new StreamReader(file);
@@ -17,9 +36,9 @@ namespace TestMapX
             Dictionary<int, TestMapX.Point> points = new Dictionary<int, TestMapX.Point>();
             Dictionary<int, Segment> segments = new Dictionary<int, Segment>();
             float y_min = 9999999.0f, x_min = 9999999.0f, y_max = -9999999.0f, x_max = -9999999.0f;
-            float fudge = 0.0f;
-            int x_zones = 4;
-            int y_zones = 4;
+            float fudge = float.Parse(config.get("nearestNeighborFudge"));
+            int x_zones = int.Parse(config.get("xZones"));
+            int y_zones = int.Parse(config.get("yZones"));
             float delta_x, delta_y;
             int[,] cells; // Will contain index into dictionary of neighbors in this cell
             Dictionary<int, List<Point>> neighbors = new Dictionary<int, List<Point>>();
@@ -169,7 +188,7 @@ namespace TestMapX
                 Console.WriteLine(points[id]);
             }
 
-            Console.WriteLine("--------- cells with their neighborhood ids-----");
+            Console.WriteLine("\n--------- cells with their neighborhood ids-----\n");
             for (int i = 0; i < neighbors.Count; i++)
             {
                 List<Point> _cells = neighbors[i];
@@ -179,7 +198,7 @@ namespace TestMapX
                 Console.Write("\n");
             }
 
-            Console.WriteLine("\n-------- neighborhoods appear reasonable, now create blocks -----");
+            Console.WriteLine("\n-------- neighborhoods appear reasonable, now create blocks -----\n");
             int pointCount = point_ids.Count;
             int k = 1;
             while (k < pointCount)
@@ -221,13 +240,13 @@ namespace TestMapX
                     Console.WriteLine("Block {0} has {1}", block.id_block, block);
                 } // End if
             } // End loop for new point
-            Console.WriteLine("------------ Points and their cell indices -----------");
+            Console.WriteLine("\n------------ Points and their cell indices -----------\n");
             foreach (int id in point_ids)
             {
                 Point p = (points[id]);
                 Console.WriteLine(p);
             }
-            Console.WriteLine("-------------Block Segment points-----------------------------------");
+            Console.WriteLine("\n-------------Block Segment points-----------------------------------\n");
             foreach (int key in blocks.Keys)
             {
                 Block aBlock = blocks[key];
@@ -244,6 +263,7 @@ namespace TestMapX
             }
             config.addComment();
             config.summarize();
+            Console.WriteLine("All Done!");
         } // End of main
     } // End of class
 }

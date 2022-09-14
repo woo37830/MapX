@@ -1,7 +1,10 @@
 ﻿#
 #  This is a sample text file containing name/value pairs
 #
-data_source=ORCL
-data_server=10.3.0.5
-data_user=MAPX_DEV
-data_password=MAPX_DEV
+dataSource=ORCL
+dataServer=10.3.0.5
+dataUser=MAPX_DEV
+dataPassword=MAPX_DEV
+nearestNeighborFudge=0.001
+xZones=4
+yZones=4

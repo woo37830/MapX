@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using TestMapX;
 
 namespace TestMapX
 {
@@ -46,8 +47,10 @@ namespace TestMapX
             this.configuration = config;
         }
 
-        public Configuration Build()
+        public Configuration Build(string noteStr = "", string interactiveFlag = "NO")
         {
+            configuration.add("Note", noteStr);
+            configuration.add("INTERACTIVE", interactiveFlag);
             configuration.update();
             return this.configuration;
         }

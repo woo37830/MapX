@@ -9,15 +9,28 @@
     {
         Dictionary<string, string> nameValues;
         string fileName;
-        string currentUser = Environment.UserName;
-        string currentWorkingDirectory = Environment.CurrentDirectory;
+        string currentUser;
+        string currentWorkingDirectory;
         DateTime now = DateTime.Now;
+        string authorStr = "";
+        string dateStr = "";
         bool altered = false;
 
-        public Configuration(string fileName)
+        public Configuration(string fileName, string noteStr = "", string interactiveFlag = "NO")
         {
             this.fileName = fileName;
+            currentUser = Environment.UserName;
+            currentWorkingDirectory = Environment.CurrentDirectory;
             nameValues = new Dictionary<string, string>();
+            this.add("Configfile", this.fileName);
+            this.add("Working Directory", this.currentWorkingDirectory);
+            this.add("Note", noteStr);
+            this.add("Author", this.currentUser);
+            this.add("Date", now.ToString());
+            this.authorStr = "\n\t\t\tAuthor: " + nameValues["Author"];
+            this.dateStr = nameValues["Date"].ToString();
+            this.add("INTERACTIVE", interactiveFlag);
+
         }
         public void add(string text)
         {
@@ -36,21 +49,23 @@
 
         public void update()
         {
+            if (this.nameValues["INTERACTIVE"].ToUpper().Equals("NO"))
+            {
+                return;
+            }
             String line = "";
-            this.add("Configfile", this.fileName);
-            this.add("Working Directory", this.currentWorkingDirectory);
-            this.add("Note", "");
             Console.WriteLine("config currently has {0}", this);
+            bool altered = false;
             this.add("Config file", this.fileName);
             this.add("Working Directory", this.currentWorkingDirectory);
             this.add("Note", "");
-            Console.Write("\nEnter name=value to edit, '.' to quit editing: ");
             while (true)
             {
+                Console.Write("\nEnter name=value to edit, '.' to quit editing: ");
                 line = Console.ReadLine();
                 if (line.StartsWith("."))
                 {
-                    if (this.altered)
+                    if (altered)
                     {
                         this.add("Date", now.ToString());
                         this.add("Author", currentUser);
@@ -63,24 +78,19 @@
 
                 Console.WriteLine("The variable {0}'s value of {1} is replaced by {2}", bits[0], this.get(bits[0]), bits[1]);
                 this.add(line);
-                this.altered = true;
+                altered = true;
             }
-        }
-
-        public override string ToString()
-        {
-            string returnStr = "\n\t";
-            foreach (KeyValuePair<string, string> pair in nameValues)
-            {
-                returnStr += pair.Key + ": " + pair.Value + "\n\t";
-            }
-            return returnStr;
         }
 
         public void addComment()
         {
+            if (this.nameValues["INTERACTIVE"].ToUpper().Equals("NO"))
+            {
+                nameValues["Comment"] = "\tNot Interactive, no run comment\n";
+                return;
+            }
             Console.Write("\nAdd comment, '.' to quit adding: ");
-            string comment = "\t";
+            string comment = "\t\t";
             string line;
             while (true)
             {
@@ -93,7 +103,7 @@
                     }
                     break;
                 }
-                comment += line + "\n\t";
+                comment += line + "\n\n\t";
             } // End while
         }
 
@@ -104,13 +114,23 @@
             string commentStr = "";
             if (nameValues["Comment"] != null)
             {
-                commentStr = "\n\t\tComments: " + nameValues["Comment"];
+                commentStr = "\n\t\t\tComments: " + nameValues["Comment"];
             }
 
             authorStr = "\n\t\t\tAuthor: " + nameValues["Author"];
             dateStr = nameValues["Date"].ToString();
+            Console.WriteLine("\n\t-------------Configuration---------\n{0}\n------------------------\n", this);
+            Console.WriteLine("\n\t\t\tSummary of Run\n\t\t\tDate: {0}\n\t\t\tNote: {1} {2} {3}", dateStr, nameValues["Note"], authorStr, commentStr);
+        }
 
-            Console.WriteLine("\n\t\t\tSummary of Run\n\t\t\tDate: {0}\n\t\tNote: {1} {2} {3}", dateStr, nameValues["Note"], authorStr, commentStr);
+        public override string ToString()
+        {
+            string returnStr = "\n\t";
+            foreach (KeyValuePair<string, string> pair in nameValues)
+            {
+                returnStr += pair.Key + ": " + pair.Value + "\n\t";
+            }
+            return returnStr;
         }
     }
 }
