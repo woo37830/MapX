@@ -28,7 +28,11 @@ namespace TestMapX
             string dataUser = config.get("dataUser");
             string dataPassword = config.get("dataPassword");
             string connString = "Data Source=" + dataSource + "; user id=" + dataUser + "; password=" + dataPassword + ";";
+            // Store codeStatus into config
+            CurrentCodeRevision sc = new CurrentCodeRevision();
+            string status = sc.getCodeStatus();
 
+            config.add("CodeStatus", status);
 
             String file = "/Users/woo/Development/workspaces/TestMapX/TestMapX/segments.txt";
             StreamReader dataStream = new StreamReader(file);
@@ -264,6 +268,7 @@ namespace TestMapX
             config.addComment();
             config.summarize();
             Console.WriteLine("All Done!");
+            Console.ReadKey();
         } // End of main
     } // End of class
 }
