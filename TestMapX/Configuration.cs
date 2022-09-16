@@ -118,9 +118,9 @@
             }
 
             authorStr = "\n\t\t\tAuthor: " + nameValues["Author"];
-            dateStr = nameValues["Date"].ToString();
-            Console.WriteLine("\n\t-------------Configuration---------\n{0}\n------------------------\n", this);
-            Console.WriteLine("\n\t\t\tSummary of Run\n\t\t\tDate: {0}\n\t\t\tNote: {1} {2} {3}", dateStr, nameValues["Note"], authorStr, commentStr);
+            string noteString = nameValues["Note"];
+            Logger.Instance.Write(1, $"\n\t-------------Configuration---------\n{this.ToString()}\n------------------------\n");
+            Logger.Instance.Write(1, $"\n\t\t\tSummary of Run\n\t\t\tNote: {noteString} {authorStr} {commentStr}");
         }
 
         public override string ToString()

@@ -6,24 +6,22 @@ namespace TestMapX
 {
     class Program
     {
+
+
         static void Main(string[] args)
         {
-            string configFile = "/Users/woo/Development/workspaces/TestMapX/TestMapX/myconfig.txt";
-            string noteStr = "";
-            string interactiveFlag = "NO";
-            if (args.Length > 0)
-            {
-                configFile = args[0]; // location of configFile
-            }
-            if (args.Length > 1)
-            {
-                noteStr = args[1];
-            }
-            if (args.Length == 2)
-            {
-                interactiveFlag = args[2];
-            }
-            Configuration config = new ConfigurationBuilder(configFile).Build(noteStr, interactiveFlag);
+
+            Configuration config = ConfigurationBuilder.CreateDefault(args);
+
+            Logger.config = config;
+            Logger logger = Logger.Instance;
+
+            FileLogger fileLogger = new FileLogger(@"/Users/woo/tmp/logs/MapX.log");
+            fileLogger.Init();
+            logger.RegisterObserver(fileLogger);
+            ConsoleLogger console = new ConsoleLogger();
+            console.Init();
+            logger.RegisterObserver(console);
             string dataSource = config.get("dataSource");
             string dataUser = config.get("dataUser");
             string dataPassword = config.get("dataPassword");
@@ -33,7 +31,6 @@ namespace TestMapX
             string status = sc.getCodeStatus();
 
             config.add("CodeStatus", status);
-
             String file = "/Users/woo/Development/workspaces/TestMapX/TestMapX/segments.txt";
             StreamReader dataStream = new StreamReader(file);
             String text;
@@ -95,7 +92,7 @@ namespace TestMapX
                     float y1 = float.Parse(bits[1]);
                     float x2 = float.Parse(bits[2]);
                     float y2 = float.Parse(bits[3]);
-                    //                   Console.WriteLine("{0:F}, {1:F}, {2:F}, {3:F}", x1, y1, x2, y2);
+                    logger.Write(3, String.Format("{0:F}, {1:F}, {2:F}, {3:F}", x1, y1, x2, y2));
                     Point p1 = new Point(x1, y1);
                     Point p2 = new Point(x2, y2);
                     points.Add(p1.id_point, p1);
@@ -142,20 +139,21 @@ namespace TestMapX
                 }
                 else
                 {
-                    Console.WriteLine("{0}", text);
+                    string formattedStr = String.Format("{0}", text);
+                    logger.Write(1, formattedStr);
                 }
             }
             List<int> point_ids = new List<int>(points.Keys);
 
-            Console.WriteLine("Domain bounds are ({0}, {1}) by ({2}, {3})", x_min, y_max, x_max, y_min);
+            logger.Write(1, String.Format("Domain bounds are ({0}, {1}) by ({2}, {3})", x_min, y_max, x_max, y_min));
 
             delta_x = (float)((x_max + fudge - (x_min - fudge)) / x_zones);
             delta_y = (float)((y_max + fudge - (y_min - fudge)) / y_zones);
             fudge = (float)(Math.Max(delta_x, delta_y) / 10.0);
             delta_x = (float)((x_max + fudge - (x_min - fudge)) / x_zones);
             delta_y = (float)((y_max + fudge - (y_min - fudge)) / y_zones);
-            Console.WriteLine("Region divided into {0} x {1} cells", x_zones, y_zones);
-            Console.WriteLine("delta_x, delta_y are: ({0}, {1})", delta_x, delta_y);
+            logger.Write(1, String.Format("Region divided into {0} x {1} cells", x_zones, y_zones));
+            logger.Write(1, String.Format("delta_x, delta_y are: ({0}, {1})", delta_x, delta_y));
             cells = new int[x_zones, y_zones];
             // Initialize cells to -1 as empty
             for (int i = 0; i < x_zones; i++)
@@ -172,7 +170,7 @@ namespace TestMapX
                 Point p = (points[id]);
                 p.x_index = x_region(p.x, x_min, delta_x);
                 p.y_index = y_region(p.y, y_min, delta_y);
-                Console.WriteLine(p);
+                logger.Write(3, p.ToString());
                 int cell_id = cells[p.x_index, p.y_index];
 
                 if (cell_id == -1)  // If no index of a list of neighbors, then
@@ -189,20 +187,20 @@ namespace TestMapX
             }
             foreach (int id in point_ids)
             {
-                Console.WriteLine(points[id]);
+                logger.Write(3, "" + points[id]);
             }
 
-            Console.WriteLine("\n--------- cells with their neighborhood ids-----\n");
+            logger.Write(3, "\n--------- cells with their neighborhood ids-----\n");
             for (int i = 0; i < neighbors.Count; i++)
             {
                 List<Point> _cells = neighbors[i];
-                Console.Write("\ncell_id : {0}) ", i);
+                logger.Write(3, String.Format("\ncell_id : {0}) ", i));
                 for (int j = 0; j < _cells.Count; j++)
-                    Console.Write(" {0}, ", _cells[j]);
-                Console.Write("\n");
+                    logger.Write(3, String.Format(" {0}, ", _cells[j]));
+                logger.Write(3, "\n");
             }
 
-            Console.WriteLine("\n-------- neighborhoods appear reasonable, now create blocks -----\n");
+            logger.Write(2, "\n-------- neighborhoods appear reasonable, now create blocks -----\n");
             int pointCount = point_ids.Count;
             int k = 1;
             while (k < pointCount)
@@ -213,44 +211,45 @@ namespace TestMapX
                     Block block = new Block(p); // Block sets startingPoint when p is added.
                     blocks[block.id_block] = block;
                     Point nextPoint = block.add(p, p.segment); // first point of segment added
-                    Console.WriteLine("Point {0} added to block {1}", p.id_point, block.id_block);
+                    logger.Write(2, String.Format("Point {0} added to block {1}", p.id_point, block.id_block));
                     while (nextPoint != null)
                     {
                         Point secondPoint = block.add(nextPoint, nextPoint.segment); // adds other end
-                        Console.WriteLine("Point {0} added to block {1}", nextPoint.id_point, block.id_block);
+                        logger.Write(2, String.Format("Point {0} added to block {1}", nextPoint.id_point, block.id_block));
                         nextPoint.segment.block = block;
                         if (secondPoint == null) // end of segment
                         {
                             int cell_id = cells[nextPoint.x_index, nextPoint.y_index]; // what cell it's in
 
                             Point firstPoint = findClosestPointTo(nextPoint, cell_id);
-                            Console.WriteLine("Found {0} near {1}", firstPoint.id_point, nextPoint.id_point);
+                            logger.Write(2, String.Format("Found {0} near {1}", firstPoint.id_point, nextPoint.id_point));
                             if (firstPoint.id_point == nextPoint.id_point)
                             {
-                                Console.WriteLine("findClosestPoint failed for {0} in {1}", nextPoint.id_point, cell_id);
+                                logger.Write(0, String.Format("findClosestPoint failed for {0} in {1}", nextPoint.id_point, cell_id));
                                 break;
                             }
                             if (firstPoint.id_point == block.startingPoint.id_point)
                             {
                                 block.closed = true;
-                                Console.WriteLine("Closed block {0}", block.id_block);
+                                logger.Write(2, String.Format("Closed block {0}", block.id_block));
                                 break;
                             }
                             nextPoint = block.add(firstPoint, firstPoint.segment);
                             if (nextPoint != null)
-                                Console.WriteLine("Point {0} added to block {1}", firstPoint.id_point, block.id_block);
+                                logger.Write(2, String.Format("Point {0} added to block {1}", firstPoint.id_point, block.id_block));
                         }
                     } // End while
-                    Console.WriteLine("Block {0} has {1}", block.id_block, block);
+                    logger.Write(3, String.Format("Block {0} has {1}", block.id_block, block));
                 } // End if
             } // End loop for new point
-            Console.WriteLine("\n------------ Points and their cell indices -----------\n");
+            logger.Write(2, "\n------------ Points and their cell indices -----------\n");
             foreach (int id in point_ids)
             {
                 Point p = (points[id]);
-                Console.WriteLine(p);
+                logger.Write(3, p.ToString());
             }
-            Console.WriteLine("\n-------------Block Segment points-----------------------------------\n");
+            logger.Write(1, $"There were {blocks.Count} blocks identified");
+            logger.Write(2, "\n-------------Block Segment points-----------------------------------\n");
             foreach (int key in blocks.Keys)
             {
                 Block aBlock = blocks[key];
@@ -262,12 +261,14 @@ namespace TestMapX
                     float y1 = seg.point_leftUpper.y;
                     float x2 = seg.point_rightLower.x;
                     float y2 = seg.point_rightLower.y;
-                    Console.WriteLine("{0} {1} {2} {3}", x1, y1, x2, y2);
+                    logger.Write(3, String.Format("{0} {1} {2} {3}", x1, y1, x2, y2));
                 }
             }
             config.addComment();
             config.summarize();
-            Console.WriteLine("All Done!");
+
+            logger.Terminate("All Done!");
+            Logger.Instance.Write(0, "For debugging, view output, enter a key-stroke to close window");
             Console.ReadKey();
         } // End of main
     } // End of class
