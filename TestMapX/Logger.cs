@@ -106,13 +106,12 @@ namespace TestMapX
 
         public void Write(int level, string message)
         {
-            if (level <= loggerLevel)
-                for (int i = 0; i < mObservers.Count; i++)
-                {
-                    ILogger observer = mObservers[i];
-                    observer.Write(level, String.Format(loggerFormat, DateTime.Now.ToString(),
-                        message));
-                }
+            for (int i = 0; i < mObservers.Count; i++)
+            {
+                ILogger observer = mObservers[i];
+                observer.Write(level, String.Format(loggerFormat, DateTime.Now.ToString(),
+                    message));
+            }
         }
 
         public void Terminate(string message)

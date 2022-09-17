@@ -13,8 +13,11 @@ namespace TestMapX
 {
     class ConsoleLogger : ILogger
     {
-        public ConsoleLogger()
+        private int logLevel = 1;
+
+        public ConsoleLogger(int logLevel = 1)
         {
+            this.logLevel = logLevel;
         }
         public void Init()
         {
@@ -25,7 +28,8 @@ namespace TestMapX
         }
         public void Write(int msgLevel, string logMessage)
         {
-            Console.WriteLine(logMessage);
+            if (msgLevel <= this.logLevel)
+                Console.WriteLine(logMessage);
         }
     }
 

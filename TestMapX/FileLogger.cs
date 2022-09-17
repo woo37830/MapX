@@ -15,6 +15,8 @@ namespace TestMapX
     {
         private string mFileName;
         private StreamWriter mLogFile;
+        private int logLevel = 1;
+
         public string FileName
         {
             get
@@ -22,9 +24,10 @@ namespace TestMapX
                 return mFileName;
             }
         }
-        public FileLogger(string fileName)
+        public FileLogger(string fileName, int logLevel = 1)
         {
             mFileName = fileName;
+            this.logLevel = logLevel;
         }
         public void Init()
         {
@@ -37,9 +40,8 @@ namespace TestMapX
         }
         public void Write(int msgLevel, string logMessage)
         {
-            // FileLogger implements the ProcessLogMessage method by
-            // writing the incoming message to a file.
-            mLogFile.WriteLine(logMessage);
+            if (msgLevel <= logLevel)
+                mLogFile.WriteLine(logMessage);
         }
     }
 

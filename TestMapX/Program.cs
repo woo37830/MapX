@@ -15,8 +15,9 @@ namespace TestMapX
 
             Logger.config = config;
             Logger logger = Logger.Instance;
-
-            FileLogger fileLogger = new FileLogger(@"/Users/woo/tmp/logs/MapX.log");
+            int fileLogLevel = int.Parse(config.get("FileLogLevel"));
+            int consoleLogLevel = int.Parse(config.get("ConsoleLogLevel"));
+            FileLogger fileLogger = new FileLogger(@"/Users/woo/tmp/logs/MapX.log", fileLogLevel);
             fileLogger.Init();
             logger.RegisterObserver(fileLogger);
             ConsoleLogger console = new ConsoleLogger();
