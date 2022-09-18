@@ -17,7 +17,7 @@ namespace TestMapX
             Logger logger = Logger.Instance;
             int fileLogLevel = int.Parse(config.get("FileLogLevel"));
             int consoleLogLevel = int.Parse(config.get("ConsoleLogLevel"));
-            FileLogger fileLogger = new FileLogger(@"/Users/woo/tmp/logs/MapX.log", fileLogLevel);
+            FileLogger fileLogger = new FileLogger(@"/Users/woo/tmp/logs/MapX");
             fileLogger.Init();
             logger.RegisterObserver(fileLogger);
             ConsoleLogger console = new ConsoleLogger();
@@ -267,9 +267,9 @@ namespace TestMapX
             }
             config.addComment();
             config.summarize();
+            logger.Write(0, "For debugging, view output, enter a key-stroke to close window");
 
             logger.Terminate("All Done!");
-            Logger.Instance.Write(0, "For debugging, view output, enter a key-stroke to close window");
             Console.ReadKey();
         } // End of main
     } // End of class

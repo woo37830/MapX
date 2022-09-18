@@ -24,13 +24,17 @@ namespace TestMapX
                 return mFileName;
             }
         }
-        public FileLogger(string fileName, int logLevel = 1)
+        public FileLogger(string fileDir)
         {
+            string path = fileDir;
+            FileInfo fi = new FileInfo(path);
+
+            string fileName = fi.DirectoryName + "/" + DateTime.Now.ToString("yyyyMMdd_HHmmssfff") + "_MapXLogger.log";
             mFileName = fileName;
-            this.logLevel = logLevel;
         }
         public void Init()
         {
+            this.logLevel = int.Parse(Logger.getConfiguration().get("FileLogLevel"));
             mLogFile = new StreamWriter(mFileName);
         }
         public void Terminate(string message)
@@ -41,7 +45,9 @@ namespace TestMapX
         public void Write(int msgLevel, string logMessage)
         {
             if (msgLevel <= logLevel)
+            {
                 mLogFile.WriteLine(logMessage);
+            }
         }
     }
 

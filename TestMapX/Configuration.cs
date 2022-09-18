@@ -119,8 +119,14 @@
 
             authorStr = "\n\t\t\tAuthor: " + nameValues["Author"];
             string noteString = nameValues["Note"];
-            Logger.Instance.Write(1, $"\n\t-------------Configuration---------\n{this.ToString()}\n------------------------\n");
-            Logger.Instance.Write(1, $"\n\t\t\tSummary of Run\n\t\t\tNote: {noteString} {authorStr} {commentStr}");
+            Logger.Instance.Write(1, $"\n\t-------------Configuration---------------------------------\n");
+            string noteStr = nameValues["Note"];
+            string solution = nameValues["SOLUTION_NAME"];
+            foreach (KeyValuePair<string, string> pair in nameValues)
+            {
+                Logger.Instance.Write(1, pair.Key + ": " + pair.Value);
+            }
+            Logger.Instance.Write(1, $"Summary of Run: {solution} \n\t\t\tNote: {noteStr} {authorStr} {commentStr}");
         }
 
         public override string ToString()

@@ -119,7 +119,7 @@ namespace TestMapX
             for (int i = 0; i < mObservers.Count; i++)
             {
                 ILogger observer = mObservers[i];
-                observer.Write(1, message);
+                observer.Terminate(message);
             }
 
         }
