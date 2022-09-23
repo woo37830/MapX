@@ -44,6 +44,8 @@
 
         public string get(string name)
         {
+            if (!nameValues.ContainsKey(name))
+                return null;
             return nameValues[name];
         }
 

@@ -109,7 +109,7 @@ namespace TestMapX
             for (int i = 0; i < mObservers.Count; i++)
             {
                 ILogger observer = mObservers[i];
-                observer.Write(level, String.Format(loggerFormat, DateTime.Now.ToString(),
+                observer.Write(level, String.Format(loggerFormat, DateTime.Now.ToString(), "(" + level.ToString() + ") - " +
                     message));
             }
         }

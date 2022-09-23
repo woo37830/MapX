@@ -5,4 +5,23 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="Configuration.cs~" />
+    <None Remove="ConfigurationBuilder.cs~" />
+    <None Remove="ConsoleLogger.cs~" />
+    <None Remove="Cell.cs~" />
+    <None Remove="blocks.txt~" />
+    <None Remove="Block.cs~" />
+    <None Remove="CurrentCodeRevision.cs~" />
+    <None Remove="FileLogger.cs~" />
+    <None Remove="ILogger.cs~" />
+    <None Remove="Logger.cs~" />
+    <None Remove="myconfig.cfg~" />
+    <None Remove="myconfig.txt~" />
+    <None Remove="Point.cs~" />
+    <None Remove="Program.cs~" />
+    <None Remove="Segment.cs~" />
+    <None Remove="segments.txt~" />
+    <None Remove="SystemCommands.cs~" />
+  </ItemGroup>
 </Project>
