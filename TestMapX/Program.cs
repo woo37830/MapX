@@ -15,8 +15,8 @@ namespace TestMapX
             {
                 watch.Start();
 
-                Configuration config = ConfigurationBuilder.CreateDefault(args);
-
+                ConfigurationBuilder bldr = new ConfigurationBuilder(@"/Users/woo/Development/workspaces/TestMapX/TestMapX/myconfig.cfg");
+                Configuration config = bldr.getConfiguration();
                 Logger.config = config;
                 Logger logger = Logger.Instance;
                 int fileLogLevel = int.Parse(config.get("FileLogLevel"));

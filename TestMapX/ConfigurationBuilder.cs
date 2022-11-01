@@ -1,16 +1,13 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
-using TestMapX;
-
+using System.IO;
 
 namespace TestMapX
 {
     public class ConfigurationBuilder
     {
+
         private static Configuration configuration;
-
-
         public static Configuration CreateDefault(string[] args)
         {
             if (configuration != null)
@@ -18,35 +15,17 @@ namespace TestMapX
                 Console.WriteLine("Cannot create another instance of Configuraton");
                 return configuration;
             }
-            string configFile = "/Users/woo/Development/workspaces/TestMapX/TestMapX/myconfig.cfg";
-            string noteStr = "";
-            string interactiveFlag = "NO";
-            if (args != null)
-            {
-                if (args.Length > 0)
-                {
-                    configFile = args[0]; // location of configFile
-                }
-                if (args.Length > 1)
-                {
-                    noteStr = args[1];
-                }
-                if (args.Length == 2)
-                {
-                    interactiveFlag = args[2];
-                }
-            }
-            Configuration config = new ConfigurationBuilder(configFile).Build(noteStr, interactiveFlag);
-            string dataSource = config.get("dataSource");
-            string dataUser = config.get("dataUser");
-            string dataPassword = config.get("dataPassword");
-            string connString = "Data Source=" + dataSource + "; user id=" + dataUser + "; password=" + dataPassword + ";";
-            config.add("connString", connString);
-            Logger Logger = Logger.Instance;
-            String formattedString = String.Format("\n\t-------------Configuration---------\n{0}\n------------------------\n", config);
-            Console.WriteLine(formattedString);
-            configuration = config;
-            return config;
+            string strExeFilePath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+            string configFile = strExeFilePath + "\\config\\myconfig.cfg";
+            Dictionary<string, string> argValues = ParseCommandLine(args);
+            configuration = new ConfigurationBuilder(configFile).Build(argValues["Note"], argValues["INTERACTIVE"]);
+            AddCommandLine(argValues);
+            return configuration;
+        }
+        public Configuration getConfiguration()
+        {
+            return configuration;
         }
         public ConfigurationBuilder(string fileName)
         {
@@ -85,7 +64,12 @@ namespace TestMapX
                 if (!text.StartsWith("#"))
                 {
                     string[] bits = text.Split('=');
-                    config.add(bits[0].Trim(), bits[1].Trim());
+                    string key = bits[0].Trim();
+                    string dataAndComment = text.Substring(bits[0].Length + 1).Trim();
+                    bits = dataAndComment.Split('#');
+                    string data = bits[0].Trim();
+                    //string data = text.Substring(bits[0].Length + 1).Trim();
+                    config.add(key, data);
                 }
             }
             configuration = config;
@@ -98,5 +82,56 @@ namespace TestMapX
             configuration.update();
             return configuration;
         }
+
+        /*
+         * ParseCommandLine will use a name / value pair to set parameters in the config file.
+         * Thus, -processArea="  ... . a sql string ...."  will become "processArea"="the sql string" in the config object
+         * They are preceeded by a '-' to distinguish them from positional parameters?
+         */
+        public static Dictionary<string, string> ParseCommandLine(string[] args)
+        {
+            Dictionary<int, string> positionalItems = new Dictionary<int, string>();
+            positionalItems.Add(0, "ConfigFile");
+            positionalItems.Add(1, "Note");
+            positionalItems.Add(2, "INTERACTIVE");
+
+
+            Dictionary<string, string> returnValues = new Dictionary<string, string>();
+            returnValues["INTERACTIVE"] = "NO";
+            returnValues["Note"] = "";
+            if (args != null)
+            {
+                int k = 0;
+                foreach (string arg in args)
+                {
+                    if (arg.StartsWith("-"))
+                    { // This is a named argument
+                        // Remove the leading '-' and store the name/value in the returnValues Dictionary
+                        int equalsIndex = arg.IndexOf('=');
+                        string name = arg.Substring(1, equalsIndex - 1);
+                        returnValues.Add(name, arg.Substring(equalsIndex + 1));
+                    }
+                    else
+                    { // This is a positional argument, not counting the named ones
+                        if (k > positionalItems.Count)
+                        {
+                            throw new Exception("Too many positional arguments on command.  Must be " + positionalItems.Count + " or less!");
+                        }
+                        returnValues[positionalItems[k]] = args[k];
+                        ++k;
+                    }
+                }
+            }
+            return returnValues;
+        }
+        public static void AddCommandLine(Dictionary<string, string> args)
+        {
+            foreach (string arg in args.Keys)
+            {
+                configuration.add(arg, args[arg]);
+            }
+            configuration.update();
+        }
     }
 }
+
